@@ -1,4 +1,4 @@
-const {
+import {
   union,
   intersection,
   difference,
@@ -6,9 +6,14 @@ const {
   symmetricDifference,
   map,
   filter,
-} = require('../src');
+} from '../src';
 
-function isEqualSetsByValues(first, second) {
+interface TArrayLikeObject<T> {
+  [key: number]: T;
+  length: number;
+}
+
+function isEqualSetsByValues<T>(first: Set<T>, second: Set<T>): boolean {
   if (first.size !== second.size) return false;
 
   for (let val of first) {
@@ -48,13 +53,36 @@ function getStringData() {
   };
 }
 
-function getArrayLikeObject(data) {
-  const result = {};
+function getArrayLikeObject<T>(data: T[]): TArrayLikeObject<T> {
+  const result: TArrayLikeObject<T> = { length: data.length };
   for (let i = 0; i < data.length; i++) {
     result[i] = data[i];
   }
-  result.length = data.length;
   return result;
+}
+
+function getInvalidCollections(): [[any, any], [any, any], [any, any]] {
+  return [
+    ['hello', []],
+    [{ foo: 'bar' }, new Set()],
+    [null, []],
+  ];
+}
+
+function getInvalidFnArgs(): [
+  [any, any],
+  [any, any],
+  [any, any],
+  [any, any],
+  [any, any]
+] {
+  return [
+    ['hello', () => null],
+    [{ foo: 'bar' }, () => null],
+    [null, () => null],
+    [[1, 2, 3], {}],
+    [[1, 2, 3], null],
+  ];
 }
 
 describe('union', () => {
@@ -68,8 +96,14 @@ describe('union', () => {
   it.each([getNumericData(), getStringData()])(
     'should return union of two sets',
     (data) => {
-      const result = union(new Set(data.first), new Set(data.second));
-      const isEqual = isEqualSetsByValues(result, new Set(data.union));
+      const result = union(
+        new Set<string | number>(data.first),
+        new Set<string | number>(data.second)
+      );
+      const isEqual = isEqualSetsByValues(
+        result,
+        new Set<string | number>(data.union)
+      );
       expect(isEqual).toBe(true);
     }
   );
@@ -78,17 +112,17 @@ describe('union', () => {
     'should return union of two array-like objects',
     (data) => {
       const result = union(
-        getArrayLikeObject(data.first),
-        getArrayLikeObject(data.second)
+        getArrayLikeObject<string | number>(data.first),
+        getArrayLikeObject<string | number>(data.second)
       );
       expect(result).toEqual(data.union);
     }
   );
 
   it('should throw an error when passing invalid arguments', () => {
-    expect(() => union('hello', [])).toThrowError();
-    expect(() => union({ foo: 'bar' }, new Set())).toThrowError();
-    expect(() => union(null, [])).toThrowError();
+    getInvalidCollections().forEach((args) => {
+      expect(() => union(...args)).toThrowError();
+    });
   });
 });
 
@@ -103,8 +137,14 @@ describe('intersection', () => {
   it.each([getNumericData(), getStringData()])(
     'should return intersection of two sets',
     (data) => {
-      const result = intersection(new Set(data.first), new Set(data.second));
-      const isEqual = isEqualSetsByValues(result, new Set(data.intersection));
+      const result = intersection(
+        new Set<string | number>(data.first),
+        new Set<string | number>(data.second)
+      );
+      const isEqual = isEqualSetsByValues(
+        result,
+        new Set<string | number>(data.intersection)
+      );
       expect(isEqual).toBe(true);
     }
   );
@@ -113,17 +153,17 @@ describe('intersection', () => {
     'should return intersection of two array-like objects',
     (data) => {
       const result = intersection(
-        getArrayLikeObject(data.first),
-        getArrayLikeObject(data.second)
+        getArrayLikeObject<string | number>(data.first),
+        getArrayLikeObject<string | number>(data.second)
       );
       expect(result).toEqual(data.intersection);
     }
   );
 
   it('should throw an error when passing invalid arguments', () => {
-    expect(() => intersection('hello', [])).toThrowError();
-    expect(() => intersection({ foo: 'bar' }, new Set())).toThrowError();
-    expect(() => intersection(null, [])).toThrowError();
+    getInvalidCollections().forEach((args) => {
+      expect(() => intersection(...args)).toThrowError();
+    });
   });
 });
 
@@ -138,8 +178,14 @@ describe('difference', () => {
   it.each([getNumericData(), getStringData()])(
     'should return difference of two sets',
     (data) => {
-      const result = difference(new Set(data.first), new Set(data.second));
-      const isEqual = isEqualSetsByValues(result, new Set(data.difference));
+      const result = difference(
+        new Set<string | number>(data.first),
+        new Set<string | number>(data.second)
+      );
+      const isEqual = isEqualSetsByValues(
+        result,
+        new Set<string | number>(data.difference)
+      );
       expect(isEqual).toBe(true);
     }
   );
@@ -148,17 +194,17 @@ describe('difference', () => {
     'should return difference of two array-like objects',
     (data) => {
       const result = difference(
-        getArrayLikeObject(data.first),
-        getArrayLikeObject(data.second)
+        getArrayLikeObject<string | number>(data.first),
+        getArrayLikeObject<string | number>(data.second)
       );
       expect(result).toEqual(data.difference);
     }
   );
 
   it('should throw an error when passing invalid arguments', () => {
-    expect(() => difference('hello', [])).toThrowError();
-    expect(() => difference({ foo: 'bar' }, new Set())).toThrowError();
-    expect(() => difference(null, [])).toThrowError();
+    getInvalidCollections().forEach((args) => {
+      expect(() => difference(...args)).toThrowError();
+    });
   });
 });
 
@@ -176,12 +222,12 @@ describe('symmetricDifference', () => {
     'should return symmetricDifference of two sets',
     (data) => {
       const result = symmetricDifference(
-        new Set(data.first),
-        new Set(data.second)
+        new Set<string | number>(data.first),
+        new Set<string | number>(data.second)
       );
       const isEqual = isEqualSetsByValues(
         result,
-        new Set(data.symmetricDifference)
+        new Set<string | number>(data.symmetricDifference)
       );
       expect(isEqual).toBe(true);
     }
@@ -191,17 +237,17 @@ describe('symmetricDifference', () => {
     'should return symmetricDifference of two array-like objects',
     (data) => {
       const result = symmetricDifference(
-        getArrayLikeObject(data.first),
-        getArrayLikeObject(data.second)
+        getArrayLikeObject<string | number>(data.first),
+        getArrayLikeObject<string | number>(data.second)
       );
       expect(result).toEqual(data.symmetricDifference);
     }
   );
 
   it('should throw an error when passing invalid arguments', () => {
-    expect(() => symmetricDifference('hello', [])).toThrowError();
-    expect(() => symmetricDifference({ foo: 'bar' }, new Set())).toThrowError();
-    expect(() => symmetricDifference(null, [])).toThrowError();
+    getInvalidCollections().forEach((args) => {
+      expect(() => symmetricDifference(...args)).toThrowError();
+    });
   });
 });
 
@@ -253,9 +299,9 @@ describe('includes', () => {
   });
 
   it('should throw an error when passing invalid arguments', () => {
-    expect(() => includes('hello', [])).toThrowError();
-    expect(() => includes({ foo: 'bar' }, new Set())).toThrowError();
-    expect(() => includes(null, [])).toThrowError();
+    getInvalidCollections().forEach((args) => {
+      expect(() => includes(...args)).toThrowError();
+    });
   });
 });
 
@@ -270,8 +316,11 @@ describe('map', () => {
   it.each([getNumericData(), getStringData()])(
     'should return new set by applying callback on every element of the passed set',
     (data) => {
-      const result = map(new Set(data.first), data.mapCb);
-      const isEqual = isEqualSetsByValues(result, new Set(data.mapResult));
+      const result = map(new Set<string | number>(data.first), data.mapCb);
+      const isEqual = isEqualSetsByValues(
+        result,
+        new Set<string | number>(data.mapResult)
+      );
       expect(isEqual).toBe(true);
     }
   );
@@ -279,17 +328,18 @@ describe('map', () => {
   it.each([getNumericData(), getStringData()])(
     'should return new array by applying callback on every element of the passed array-like object',
     (data) => {
-      const result = map(getArrayLikeObject(data.first), data.mapCb);
+      const result = map(
+        getArrayLikeObject<string | number>(data.first),
+        data.mapCb
+      );
       expect(result).toEqual(data.mapResult);
     }
   );
 
   it('should throw an error when passing invalid arguments', () => {
-    expect(() => map('hello', () => null)).toThrowError();
-    expect(() => map({ foo: 'bar' }, () => null)).toThrowError();
-    expect(() => map(null, () => null)).toThrowError();
-    expect(() => map([1, 2, 3], {})).toThrowError();
-    expect(() => map([1, 2, 3], null)).toThrowError();
+    getInvalidFnArgs().forEach((args) => {
+      expect(() => map(...args)).toThrowError();
+    });
   });
 });
 
@@ -304,8 +354,14 @@ describe('filter', () => {
   it.each([getNumericData(), getStringData()])(
     'should return filtered set by applying callback on every element of the passed set',
     (data) => {
-      const result = filter(new Set(data.first), data.filterCb);
-      const isEqual = isEqualSetsByValues(result, new Set(data.filterResult));
+      const result = filter(
+        new Set<string | number>(data.first),
+        data.filterCb
+      );
+      const isEqual = isEqualSetsByValues(
+        result,
+        new Set<string | number>(data.filterResult)
+      );
       expect(isEqual).toBe(true);
     }
   );
@@ -313,16 +369,17 @@ describe('filter', () => {
   it.each([getNumericData(), getStringData()])(
     'should return filtered array by applying callback on every element of the passed array-like object',
     (data) => {
-      const result = filter(getArrayLikeObject(data.first), data.filterCb);
+      const result = filter(
+        getArrayLikeObject<string | number>(data.first),
+        data.filterCb
+      );
       expect(result).toEqual(data.filterResult);
     }
   );
 
   it('should throw an error when passing invalid arguments', () => {
-    expect(() => filter('hello', () => null)).toThrowError();
-    expect(() => filter({ foo: 'bar' }, () => null)).toThrowError();
-    expect(() => filter(null, () => null)).toThrowError();
-    expect(() => filter([1, 2, 3], {})).toThrowError();
-    expect(() => filter([1, 2, 3], null)).toThrowError();
+    getInvalidFnArgs().forEach((args) => {
+      expect(() => filter(...args)).toThrowError();
+    });
   });
 });

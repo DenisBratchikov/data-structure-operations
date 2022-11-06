@@ -1,16 +1,16 @@
 const { terser } = require('rollup-plugin-terser');
 const resolve = require('@rollup/plugin-node-resolve');
 const commonjs = require('@rollup/plugin-commonjs');
+const typescript = require('rollup-plugin-typescript2');
 
 const pkg = require('./package.json');
 
-// CommonJS (for Node) and ES module (for bundlers) build.
 module.exports = {
-  input: 'src/index.js',
+  input: 'src/index.ts',
   output: [
     {
       file: pkg.main,
-      format: 'esm',
+      format: 'cjs',
       exports: 'auto',
     },
     {
@@ -25,5 +25,10 @@ module.exports = {
       name: 'js-collection-operations',
     },
   ],
-  plugins: [resolve(), commonjs(), terser()],
+  plugins: [
+    typescript({ useTsconfigDeclarationDir: true }),
+    resolve(),
+    commonjs(),
+    terser(),
+  ],
 };

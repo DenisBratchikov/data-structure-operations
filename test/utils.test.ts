@@ -1,11 +1,11 @@
-const {
+import {
   getInvalidValueErrMsg,
   getInvalidArgsErrMsg,
-  isSets,
   isArrayLikeParams,
   isArrayLike,
   checkIsFunction,
-} = require('../src/utils');
+} from '../src/utils';
+import type { TCollection } from '../src/types';
 
 function getArrayLikeObject() {
   return { 0: 'foo', 1: 'bar', length: 2 };
@@ -27,17 +27,6 @@ describe('getInvalidArgsErrMsg', () => {
     const str = getInvalidArgsErrMsg(arg1, arg2);
     expect(str).toEqual(expect.stringContaining(arg1));
     expect(str).toEqual(expect.stringContaining(arg2));
-  });
-});
-
-describe('isSets', () => {
-  it('should return true when passing two sets', () => {
-    expect(isSets(new Set(), new Set())).toBe(true);
-  });
-
-  it('should return false when passing something but not set', () => {
-    expect(isSets([], new Set())).toBe(false);
-    expect(isSets(new Set(), 'hello')).toBe(false);
   });
 });
 
@@ -68,7 +57,7 @@ describe('isArrayLike', () => {
   });
 
   it('should return false for simple object', () => {
-    expect(isArrayLike({})).toBe(false);
+    expect(isArrayLike({} as TCollection<unknown>)).toBe(false);
   });
 
   it('should return false for the object with 0 length', () => {
@@ -86,6 +75,6 @@ describe('checkIsFunction', () => {
   });
 
   it('should throw an error when passing invalid value', () => {
-    expect(() => checkIsFunction(null)).toThrowError();
+    expect(() => checkIsFunction(null as unknown as Function)).toThrowError();
   });
 });

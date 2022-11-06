@@ -4,12 +4,12 @@
     "lib": ["ES6"],
     "rootDir": "src",
     "outDir": "dist",
-    // "allowJs": true,
-    "typeRoots": ["src"],
     "declaration": true,
-    "emitDeclarationOnly": true,
-    "declarationDir": "dist"
+    "declarationDir": "dist/@types",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noEmitOnError": false
   },
-  "include": ["src"],
+  "include": ["src/index.ts"],
   "exclude": ["node_modules"]
 }

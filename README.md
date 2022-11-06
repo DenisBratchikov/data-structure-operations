@@ -2,6 +2,8 @@
 
 `js-collection-operations` lets you easily find **union**, **intersection**, **difference**, **symmetric difference** and **includes** of JavaScript Arrays, Sets and Array-like Objects. Also you can find **map** and **filter** functions for Sets and Array-like Objects.
 
+You may use this library both in Browser and in NodeJS environment.
+
 ## Installation
 
 Using npm:
